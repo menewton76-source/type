@@ -1,0 +1,953 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Find Your FireStarter Type | She Builds Anyway</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,700;0,900;1,400&family=Nunito:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<style>
+:root {
+  --pacific-blue: #3B7A9A;
+  --coral: #E89B8A;
+  --cream: #FDFAF3;
+  --bg: #13162A;
+  --surface: #1C2038;
+  --surface-2: #242844;
+  --border: rgba(59, 122, 154, 0.22);
+  --muted: rgba(253, 250, 243, 0.52);
+  --font-display: 'Playfair Display', Georgia, serif;
+  --font-body: 'Nunito', system-ui, sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg);
+  color: var(--cream);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(ellipse 90% 45% at 50% 110%, rgba(232,155,138,0.13) 0%, transparent 100%),
+    radial-gradient(ellipse 60% 30% at 15% 10%, rgba(59,122,154,0.09) 0%, transparent 100%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+#embers {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+  overflow: hidden;
+}
+
+.ember {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0;
+  animation: emberRise linear infinite;
+}
+
+@keyframes emberRise {
+  0%   { transform: translate(0, 0) scale(0.5); opacity: 0; }
+  8%   { opacity: 0.8; }
+  55%  { opacity: 0.35; }
+  100% { transform: translate(var(--dx, 40px), -105vh) scale(0.2); opacity: 0; }
+}
+
+.app {
+  position: relative;
+  z-index: 1;
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 24px 16px 48px;
+}
+
+.screen { display: none; width: 100%; max-width: 580px; }
+.screen.active { display: block; animation: screenIn 0.48s ease; }
+
+@keyframes screenIn {
+  from { opacity: 0; transform: translateY(22px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+/* ════ INTRO ════ */
+.intro {
+  text-align: center;
+  padding: 48px 20px;
+}
+
+.intro-tag {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  color: var(--coral);
+  margin-bottom: 28px;
+}
+
+.flame-glyph {
+  display: block;
+  font-size: 58px;
+  line-height: 1;
+  margin-bottom: 22px;
+  animation: flicker 2.6s ease-in-out infinite alternate;
+  filter: drop-shadow(0 0 14px rgba(232,155,138,0.55));
+}
+
+@keyframes flicker {
+  from { transform: scale(1) rotate(-1.5deg); filter: drop-shadow(0 0 10px rgba(232,155,138,0.45)); }
+  to   { transform: scale(1.07) rotate(1.5deg); filter: drop-shadow(0 0 26px rgba(232,155,138,0.85)); }
+}
+
+.intro h1 {
+  font-family: var(--font-display);
+  font-size: clamp(2.6rem, 9vw, 4.2rem);
+  font-weight: 900;
+  line-height: 1.08;
+  margin-bottom: 18px;
+  background: linear-gradient(148deg, var(--cream) 20%, var(--coral) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.intro-sub {
+  font-size: 1.05rem;
+  line-height: 1.82;
+  color: var(--muted);
+  max-width: 360px;
+  margin: 0 auto 38px;
+}
+
+.tagline {
+  font-size: 0.78rem;
+  color: rgba(253,250,243,0.22);
+  letter-spacing: 1px;
+  margin-top: 18px;
+}
+
+/* ════ BUTTONS ════ */
+.btn {
+  appearance: none;
+  border: none;
+  border-radius: 50px;
+  cursor: pointer;
+  font-family: var(--font-body);
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  transition: all 0.24s ease;
+  display: inline-block;
+  text-align: center;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, #e48870, var(--coral));
+  color: var(--cream);
+  padding: 15px 38px;
+  font-size: 1rem;
+  box-shadow: 0 4px 22px rgba(232,155,138,0.28);
+}
+
+.btn-primary:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 10px 30px rgba(232,155,138,0.48);
+}
+
+.btn-primary:disabled {
+  opacity: 0.32;
+  cursor: not-allowed;
+}
+
+.btn-ghost {
+  background: transparent;
+  border: 2px solid var(--border);
+  color: var(--muted);
+  padding: 13px 24px;
+  font-size: 0.88rem;
+}
+
+.btn-ghost:hover {
+  border-color: var(--pacific-blue);
+  color: var(--cream);
+}
+
+.btn-outline {
+  background: transparent;
+  border: 2px solid var(--pacific-blue);
+  color: var(--cream);
+  padding: 14px 34px;
+  font-size: 0.95rem;
+}
+
+.btn-outline:hover {
+  background: var(--pacific-blue);
+  transform: translateY(-1px);
+}
+
+/* ════ QUIZ ════ */
+.progress-wrap { margin-bottom: 26px; }
+
+.progress-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.progress-step {
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+  color: var(--coral);
+}
+
+.dots { display: flex; gap: 7px; }
+
+.dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--surface-2);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.dot.done   { background: var(--pacific-blue); }
+.dot.active { background: var(--coral); transform: scale(1.35); }
+
+.progress-track {
+  height: 3px;
+  background: var(--surface-2);
+  border-radius: 2px;
+  overflow: hidden;
+}
+
+.progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--pacific-blue), var(--coral));
+  border-radius: 2px;
+  transition: width 0.52s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.q-card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 24px;
+  padding: 36px 32px;
+}
+
+@media (max-width: 480px) {
+  .q-card { padding: 26px 18px; }
+}
+
+.q-label {
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--pacific-blue);
+  margin-bottom: 10px;
+}
+
+.q-text {
+  font-family: var(--font-display);
+  font-size: clamp(1.2rem, 4vw, 1.55rem);
+  font-weight: 700;
+  line-height: 1.38;
+  color: var(--cream);
+  margin-bottom: 26px;
+}
+
+.answers-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 30px;
+}
+
+.ans-btn {
+  appearance: none;
+  background: var(--surface-2);
+  border: 2px solid transparent;
+  border-radius: 14px;
+  padding: 14px 18px;
+  text-align: left;
+  font-family: var(--font-body);
+  font-size: 0.94rem;
+  font-weight: 500;
+  color: var(--cream);
+  cursor: pointer;
+  transition: border-color 0.18s, background 0.18s;
+  line-height: 1.45;
+}
+
+.ans-btn:hover    { border-color: rgba(59,122,154,0.55); background: rgba(59,122,154,0.14); }
+.ans-btn.selected { border-color: var(--coral); background: rgba(232,155,138,0.11); }
+
+.q-nav {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.q-card.out-l { animation: outLeft  0.26s ease forwards; }
+.q-card.out-r { animation: outRight 0.26s ease forwards; }
+.q-card.in-r  { animation: inRight  0.26s ease forwards; }
+.q-card.in-l  { animation: inLeft   0.26s ease forwards; }
+
+@keyframes outLeft  { to { opacity:0; transform:translateX(-26px); } }
+@keyframes outRight { to { opacity:0; transform:translateX(26px);  } }
+@keyframes inRight  { from { opacity:0; transform:translateX(26px);  } to { opacity:1; transform:translateX(0); } }
+@keyframes inLeft   { from { opacity:0; transform:translateX(-26px); } to { opacity:1; transform:translateX(0); } }
+
+/* ════ RESULT ════ */
+.result-wrap { text-align: center; }
+
+.result-reveal { animation: resultReveal 0.85s cubic-bezier(0.34, 1.56, 0.64, 1); }
+
+@keyframes resultReveal {
+  0%   { opacity:0; transform:scale(0.86); }
+  65%  { transform:scale(1.025); }
+  100% { opacity:1; transform:scale(1); }
+}
+
+.r-eyebrow {
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 3.5px;
+  text-transform: uppercase;
+  color: var(--coral);
+  margin-bottom: 6px;
+}
+
+.r-you-are {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+
+.r-type {
+  font-family: var(--font-display);
+  font-size: clamp(2.8rem, 11vw, 5.2rem);
+  font-weight: 900;
+  line-height: 1;
+  background: linear-gradient(140deg, var(--cream) 15%, var(--coral) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  filter: drop-shadow(0 0 18px rgba(232,155,138,0.32));
+  margin-bottom: 24px;
+}
+
+.r-desc {
+  font-size: 1rem;
+  line-height: 1.88;
+  color: var(--muted);
+  max-width: 440px;
+  margin: 0 auto 28px;
+}
+
+.truth-block {
+  background: var(--surface);
+  border-left: 3px solid var(--coral);
+  border-radius: 0 16px 16px 0;
+  padding: 20px 24px;
+  text-align: left;
+  margin: 0 auto 40px;
+  max-width: 480px;
+}
+
+.truth-label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--coral);
+  margin-bottom: 10px;
+}
+
+.truth-text {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 1.1rem;
+  line-height: 1.68;
+  color: var(--cream);
+}
+
+.name-row { margin-bottom: 30px; }
+
+.name-row label {
+  display: block;
+  font-size: 0.84rem;
+  font-weight: 600;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.name-field {
+  background: var(--surface);
+  border: 2px solid var(--border);
+  border-radius: 50px;
+  padding: 13px 24px;
+  font-family: var(--font-body);
+  font-size: 1rem;
+  color: var(--cream);
+  width: 100%;
+  max-width: 280px;
+  text-align: center;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.name-field:focus { border-color: var(--coral); }
+.name-field::placeholder { color: rgba(253,250,243,0.22); }
+
+.card-wrap { margin-bottom: 28px; }
+
+.card-label {
+  font-size: 0.73rem;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 16px;
+}
+
+/* Member card — preview */
+.member-card {
+  width: 300px;
+  height: 300px;
+  margin: 0 auto;
+  border-radius: 22px;
+  overflow: hidden;
+  position: relative;
+  background: linear-gradient(150deg, #181B30 0%, #22263E 55%, #191C31 100%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 26px 22px;
+  text-align: center;
+  box-shadow:
+    0 24px 60px rgba(0,0,0,0.55),
+    inset 0 0 0 1px rgba(232,155,138,0.13);
+}
+
+.member-card::before {
+  content: '';
+  position: absolute;
+  bottom: 0; left: 0; right: 0; height: 55%;
+  background: radial-gradient(ellipse at 50% 100%, rgba(232,155,138,0.16) 0%, transparent 70%);
+}
+
+.member-card::after {
+  content: '';
+  position: absolute;
+  top: 0; left: 0; right: 0; height: 40%;
+  background: radial-gradient(ellipse at 50% 0%, rgba(59,122,154,0.1) 0%, transparent 70%);
+}
+
+.mc-inner { position: relative; z-index: 1; width: 100%; }
+
+.mc-brand {
+  font-size: 8.5px;
+  font-weight: 700;
+  letter-spacing: 2.5px;
+  text-transform: uppercase;
+  color: var(--coral);
+  margin-bottom: 8px;
+}
+
+.mc-rule {
+  width: 34px;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--coral), transparent);
+  margin: 0 auto 10px;
+}
+
+.mc-name {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 600;
+  color: rgba(253,250,243,0.76);
+  margin-bottom: 3px;
+}
+
+.mc-you-are {
+  font-family: var(--font-display);
+  font-size: 9.5px;
+  color: rgba(253,250,243,0.48);
+  margin-bottom: 2px;
+}
+
+.mc-type {
+  font-family: var(--font-display);
+  font-size: 30px;
+  font-weight: 900;
+  background: linear-gradient(135deg, #FDFAF3 20%, #E89B8A 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  line-height: 1.1;
+  margin-bottom: 11px;
+}
+
+.mc-truth {
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: 10px;
+  color: var(--cream);
+  line-height: 1.62;
+  margin-bottom: 11px;
+}
+
+.mc-url {
+  font-size: 7px;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--pacific-blue);
+}
+
+.dl-section { margin-bottom: 38px; }
+
+.dl-note {
+  font-size: 0.76rem;
+  color: var(--muted);
+  margin-top: 10px;
+}
+
+.cta-section {
+  border-top: 1px solid rgba(255,255,255,0.07);
+  padding-top: 34px;
+  margin-top: 4px;
+}
+
+.cta-text {
+  font-size: 1rem;
+  line-height: 1.82;
+  color: var(--muted);
+  max-width: 390px;
+  margin: 0 auto 20px;
+}
+
+#export-stage {
+  position: fixed;
+  top: -9999px;
+  left: -9999px;
+  width: 600px;
+  height: 600px;
+  overflow: hidden;
+}
+</style>
+</head>
+<body>
+
+<div id="embers" aria-hidden="true"></div>
+<div id="export-stage" aria-hidden="true"></div>
+
+<main class="app">
+
+  <!-- INTRO -->
+  <section id="screen-intro" class="screen active" aria-label="Quiz introduction">
+    <div class="intro">
+      <p class="intro-tag">She Builds Anyway</p>
+      <span class="flame-glyph" aria-hidden="true">&#x1F525;</span>
+      <h1>Find Your<br>FireStarter Type</h1>
+      <p class="intro-sub">5 questions. No wrong answers. Find out exactly where you are in the fire right now.</p>
+      <button class="btn btn-primary" onclick="startQuiz()">Find My Type</button>
+      <p class="tagline">AI tools. Stolen hours. Real results.</p>
+    </div>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="screen-quiz" class="screen" aria-label="Quiz questions">
+    <div class="progress-wrap" aria-live="polite" aria-atomic="true">
+      <div class="progress-top">
+        <span class="progress-step" id="progress-step">Question 1 of 5</span>
+        <div class="dots" id="dots" aria-hidden="true">
+          <div class="dot active"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+          <div class="dot"></div>
+        </div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-fill" style="width:20%"></div>
+      </div>
+    </div>
+
+    <div class="q-card" id="q-card">
+      <p class="q-label" id="q-label">Question 1</p>
+      <h2 class="q-text" id="q-text"></h2>
+      <div class="answers-list" id="answers-list" role="group" aria-labelledby="q-text"></div>
+      <div class="q-nav">
+        <button class="btn btn-ghost" id="btn-back" onclick="goBack()" style="visibility:hidden">Back</button>
+        <button class="btn btn-primary" id="btn-next" onclick="goNext()" disabled>Next</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- RESULT -->
+  <section id="screen-result" class="screen" aria-label="Your FireStarter type">
+    <div class="result-wrap">
+      <div id="result-content"></div>
+    </div>
+  </section>
+
+</main>
+
+<script>
+const QUESTIONS = [
+  {
+    text: "When do you do most of your building?",
+    answers: [
+      { text: "Night owl after everyone's asleep",                 pts: 5 },
+      { text: "Early bird before the house wakes up",              pts: 4 },
+      { text: "Stolen minutes wherever I can find them",           pts: 3 },
+      { text: "Lunch break escape in the car",                     pts: 2 },
+      { text: "Honestly whenever — I haven't found my time yet", pts: 1 }
+    ]
+  },
+  {
+    text: "When something feels hard, what do you do?",
+    answers: [
+      { text: "Push through no matter what",              pts: 5 },
+      { text: "Step away and come back fresh",            pts: 4 },
+      { text: "Talk it out with someone",                 pts: 3 },
+      { text: "Go quiet and figure it out alone",         pts: 2 },
+      { text: "I haven't hit that wall yet",              pts: 1 }
+    ]
+  },
+  {
+    text: "What drives you most?",
+    answers: [
+      { text: "Freedom",                                  pts: 5 },
+      { text: "Proving something to myself",              pts: 4 },
+      { text: "Building something for my kids",           pts: 3 },
+      { text: "Just figuring out if I can do it",         pts: 2 },
+      { text: "I'm still figuring out what drives me",    pts: 1 }
+    ]
+  },
+  {
+    text: "How do you feel about starting something new?",
+    answers: [
+      { text: "Excited and jump straight in",             pts: 5 },
+      { text: "Nervous but do it anyway",                 pts: 4 },
+      { text: "Need to research first",                   pts: 3 },
+      { text: "Wait until I feel ready",                  pts: 2 },
+      { text: "I haven't really started anything yet",    pts: 1 }
+    ]
+  },
+  {
+    text: "Pick the one that sounds most like you right now:",
+    answers: [
+      { text: "I'm building and I'm not stopping",        pts: 5 },
+      { text: "I'm moving but slowly",                    pts: 4 },
+      { text: "I've started but keep stopping",           pts: 3 },
+      { text: "I have big ideas but haven't started yet", pts: 2 },
+      { text: "I'm not sure where I even am right now",   pts: 1 }
+    ]
+  }
+];
+
+const RESULTS = [
+  {
+    range: [5, 7],
+    type: "The Spark",
+    short: "Spark",
+    desc: "Just arrived. Full of ideas, not sure where to start yet. The energy is there even if the path isn't clear. She is the beginning of everything.",
+    truth: "You don't need a plan yet. You just need to stay lit."
+  },
+  {
+    range: [8, 10],
+    type: "The Ember",
+    short: "Ember",
+    desc: "Quiet and steady. She doesn't make a lot of noise but she doesn't go out either. She's been carrying this dream longer than anyone knows.",
+    truth: "You've been keeping this alive on nothing. Imagine what happens when someone finally fans your flame."
+  },
+  {
+    range: [11, 13],
+    type: "The Kindle",
+    short: "Kindle",
+    desc: "She's started. Stopped. Started again. Every time she comes back she's a little further along than before. She doesn't quit — she just takes breaks.",
+    truth: "You didn't give up. You took a breath. There's a difference."
+  },
+  {
+    range: [14, 17],
+    type: "The Flame",
+    short: "Flame",
+    desc: "Quiet and consistent. She shows up in stolen hours and something real is starting to take shape.",
+    truth: "Steady is underrated. You're building something that lasts."
+  },
+  {
+    range: [18, 21],
+    type: "The Wildfire",
+    short: "Wildfire",
+    desc: "She's all in. Messy, fast, figuring it out as she goes. She breaks things and fixes them and keeps moving anyway.",
+    truth: "You were never meant to be contained. Just keep going."
+  },
+  {
+    range: [22, 25],
+    type: "The Phoenix",
+    short: "Phoenix",
+    desc: "She's been through something. A restart. A hard season. She's building again and this time she knows exactly why.",
+    truth: "Everything you lost taught you something. Now watch what you build with it."
+  }
+];
+
+/* State */
+let qIndex = 0;
+let chosen = new Array(5).fill(null);
+let result = null;
+
+/* Ember particles */
+(function () {
+  const container = document.getElementById('embers');
+  const colors = ['#E89B8A', '#d4796a', '#FDFAF3', '#3B7A9A'];
+  for (let i = 0; i < 18; i++) {
+    const e = document.createElement('div');
+    e.className = 'ember';
+    const s = 2 + Math.random() * 3.5;
+    e.style.cssText =
+      'width:' + s + 'px;height:' + s + 'px;' +
+      'left:' + (Math.random() * 100) + '%;' +
+      'bottom:' + (Math.random() * 25) + '%;' +
+      'background:' + colors[Math.floor(Math.random() * colors.length)] + ';' +
+      '--dx:' + ((Math.random() - 0.5) * 130) + 'px;' +
+      'animation-duration:' + (7 + Math.random() * 11) + 's;' +
+      'animation-delay:' + (Math.random() * 14) + 's;';
+    container.appendChild(e);
+  }
+})();
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(function (s) { s.classList.remove('active'); });
+  document.getElementById(id).classList.add('active');
+  window.scrollTo({ top: 0, behavior: 'smooth' });
+}
+
+function startQuiz() {
+  qIndex = 0;
+  chosen.fill(null);
+  showScreen('screen-quiz');
+  renderQ();
+}
+
+function renderQ() {
+  var q = QUESTIONS[qIndex];
+  var pct = ((qIndex + 1) / 5) * 100;
+
+  document.getElementById('progress-fill').style.width = pct + '%';
+  document.getElementById('progress-step').textContent = 'Question ' + (qIndex + 1) + ' of 5';
+
+  document.querySelectorAll('.dot').forEach(function (d, i) {
+    d.className = 'dot' + (i < qIndex ? ' done' : i === qIndex ? ' active' : '');
+  });
+
+  document.getElementById('q-label').textContent = 'Question ' + (qIndex + 1);
+  document.getElementById('q-text').textContent   = q.text;
+
+  var list = document.getElementById('answers-list');
+  list.innerHTML = '';
+  q.answers.forEach(function (a) {
+    var btn = document.createElement('button');
+    btn.className = 'ans-btn' + (chosen[qIndex] === a.pts ? ' selected' : '');
+    btn.textContent = a.text;
+    btn.type = 'button';
+    btn.addEventListener('click', function () { pickAnswer(a.pts, btn); });
+    list.appendChild(btn);
+  });
+
+  var btnBack = document.getElementById('btn-back');
+  var btnNext = document.getElementById('btn-next');
+  btnBack.style.visibility = qIndex === 0 ? 'hidden' : 'visible';
+  btnNext.disabled    = chosen[qIndex] === null;
+  btnNext.textContent = qIndex === 4 ? 'See My Type' : 'Next';
+}
+
+function pickAnswer(pts, btn) {
+  chosen[qIndex] = pts;
+  document.querySelectorAll('.ans-btn').forEach(function (b) { b.classList.remove('selected'); });
+  btn.classList.add('selected');
+  document.getElementById('btn-next').disabled = false;
+}
+
+function animateCard(outCls, inCls, cb) {
+  var card = document.getElementById('q-card');
+  card.classList.add(outCls);
+  setTimeout(function () {
+    card.classList.remove(outCls);
+    cb();
+    card.classList.add(inCls);
+    setTimeout(function () { card.classList.remove(inCls); }, 270);
+  }, 260);
+}
+
+function goNext() {
+  if (chosen[qIndex] === null) return;
+  if (qIndex < 4) {
+    animateCard('out-l', 'in-r', function () { qIndex++; renderQ(); });
+  } else {
+    showResultScreen();
+  }
+}
+
+function goBack() {
+  if (qIndex === 0) return;
+  animateCard('out-r', 'in-l', function () { qIndex--; renderQ(); });
+}
+
+function showResultScreen() {
+  var total = chosen.reduce(function (s, v) { return s + (v || 0); }, 0);
+  result = RESULTS.find(function (r) { return total >= r.range[0] && total <= r.range[1]; })
+    || RESULTS[RESULTS.length - 1];
+  showScreen('screen-result');
+
+  document.getElementById('result-content').innerHTML =
+    '<div class="result-reveal">' +
+      '<p class="r-eyebrow">Your FireStarter Type</p>' +
+      '<p class="r-you-are">You are...</p>' +
+      '<h2 class="r-type">' + result.type + '</h2>' +
+      '<p class="r-desc">' + result.desc + '</p>' +
+      '<div class="truth-block">' +
+        '<p class="truth-label">Your FireStarter Truth</p>' +
+        '<p class="truth-text">“' + result.truth + '”</p>' +
+      '</div>' +
+
+      '<div class="name-row">' +
+        '<label for="name-input">Type your name to personalize your card</label>' +
+        '<input type="text" id="name-input" class="name-field" placeholder="Your first name" maxlength="20" autocomplete="given-name">' +
+      '</div>' +
+
+      '<div class="card-wrap">' +
+        '<p class="card-label">Your Member Card</p>' +
+        '<div class="member-card" id="member-card">' +
+          '<div class="mc-inner">' +
+            '<p class="mc-brand">She Builds Anyway</p>' +
+            '<div class="mc-rule"></div>' +
+            '<p class="mc-name" id="mc-name">FireStarter</p>' +
+            '<p class="mc-you-are">You are</p>' +
+            '<p class="mc-type">' + result.type + '</p>' +
+            '<p class="mc-truth">“' + result.truth + '”</p>' +
+            '<p class="mc-url">skool.com/she-builds-anyway</p>' +
+          '</div>' +
+        '</div>' +
+      '</div>' +
+
+      '<div class="dl-section">' +
+        '<button class="btn btn-primary" id="btn-dl" onclick="downloadCard()" style="min-width:220px;">Download My Card</button>' +
+        '<p class="dl-note">Share in Skool or on Instagram</p>' +
+      '</div>' +
+
+      '<div class="cta-section">' +
+        '<p class="cta-text">You found your type. Now come find your people. We\'re inside building in stolen hours every day. Come be a FireStarter.</p>' +
+        '<a href="https://skool.com/she-builds-anyway" target="_blank" rel="noopener noreferrer" class="btn btn-outline">' +
+          'Join She Builds Anyway' +
+        '</a>' +
+        '<p class="tagline" style="margin-top:20px;">AI tools. Stolen hours. Real results.</p>' +
+      '</div>' +
+
+      '<div style="text-align:center;margin-top:28px;">' +
+        '<button class="btn btn-ghost" onclick="startQuiz()" style="font-size:0.85rem;padding:11px 22px;">Take it again</button>' +
+      '</div>' +
+    '</div>';
+
+  document.getElementById('name-input').addEventListener('input', function () {
+    document.getElementById('mc-name').textContent = this.value.trim() || 'FireStarter';
+  });
+}
+
+function downloadCard() {
+  var nameVal = document.getElementById('name-input') ? document.getElementById('name-input').value.trim() : '';
+  var name = nameVal || 'FireStarter';
+  var btn  = document.getElementById('btn-dl');
+
+  btn.disabled    = true;
+  btn.textContent = 'Creating your card...';
+
+  var stage = document.getElementById('export-stage');
+  stage.innerHTML = buildExportHTML(name);
+
+  setTimeout(function () {
+    html2canvas(stage.querySelector('.ex-card'), {
+      scale: 2,
+      backgroundColor: null,
+      useCORS: true,
+      allowTaint: false,
+      logging: false,
+      width: 600,
+      height: 600
+    })
+    .then(function (canvas) {
+      var link    = document.createElement('a');
+      link.download = 'firestarter-' + result.short.toLowerCase() + '.png';
+      link.href   = canvas.toDataURL('image/png');
+      link.click();
+      btn.textContent = 'Downloaded!';
+      setTimeout(function () {
+        btn.textContent = 'Download My Card';
+      }, 2400);
+    })
+    .catch(function () {
+      alert('Download failed. Try right-clicking the card preview and saving the image.');
+      btn.textContent = 'Download My Card';
+    })
+    .finally(function () {
+      btn.disabled = false;
+      stage.innerHTML = '';
+    });
+  }, 220);
+}
+
+function buildExportHTML(name) {
+  var safe = escHtml(name);
+  return '<div class="ex-card" style="' +
+    'width:600px;height:600px;border-radius:40px;overflow:hidden;' +
+    'position:relative;' +
+    'background:linear-gradient(150deg,#181B30 0%,#22263E 55%,#191C31 100%);' +
+    'display:flex;flex-direction:column;align-items:center;justify-content:center;' +
+    'padding:56px 52px;text-align:center;' +
+    'font-family:Nunito,sans-serif;">' +
+    '<div style="position:absolute;bottom:0;left:0;right:0;height:55%;' +
+      'background:radial-gradient(ellipse at 50% 100%,rgba(232,155,138,0.18) 0%,transparent 70%);"></div>' +
+    '<div style="position:absolute;top:0;left:0;right:0;height:40%;' +
+      'background:radial-gradient(ellipse at 50% 0%,rgba(59,122,154,0.12) 0%,transparent 70%);"></div>' +
+    '<div style="position:relative;z-index:1;width:100%;">' +
+      '<p style="font-size:13px;font-weight:700;letter-spacing:3px;text-transform:uppercase;color:#E89B8A;margin-bottom:14px;">She Builds Anyway</p>' +
+      '<div style="width:48px;height:1px;background:linear-gradient(90deg,transparent,#E89B8A,transparent);margin:0 auto 18px;"></div>' +
+      '<p style="font-family:Nunito,sans-serif;font-size:20px;font-weight:600;color:rgba(253,250,243,0.78);margin-bottom:6px;">' + safe + '</p>' +
+      '<p style="font-family:\'Playfair Display\',Georgia,serif;font-size:16px;color:rgba(253,250,243,0.52);margin-bottom:6px;">You are</p>' +
+      '<p style="font-family:\'Playfair Display\',Georgia,serif;font-size:66px;font-weight:900;color:#FDFAF3;line-height:1.05;margin-bottom:26px;">' + result.type + '</p>' +
+      '<p style="font-family:\'Playfair Display\',Georgia,serif;font-style:italic;font-size:17px;color:#FDFAF3;line-height:1.72;margin-bottom:26px;padding:0 12px;">“' + result.truth + '”</p>' +
+      '<p style="font-size:11px;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;color:#3B7A9A;">skool.com/she-builds-anyway</p>' +
+    '</div>' +
+  '</div>';
+}
+
+function escHtml(str) {
+  var d = document.createElement('div');
+  d.textContent = str;
+  return d.innerHTML;
+}
+</script>
+</body>
+</html>
